@@ -4,6 +4,7 @@ import (
 	"backend/internal/randomizer"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -28,4 +29,9 @@ func GenerateCode() Code {
 func (c *Code) CodeString() {
 	fmt.Println(c.Value)
 	fmt.Println(c.Seed)
+}
+
+func (c *Code) CodeValueAsSlice() []string {
+	codeValueSlice := strings.Split(c.Value, "")
+	return codeValueSlice
 }
