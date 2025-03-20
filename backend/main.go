@@ -1,56 +1,60 @@
 package main
 
-/* import (
-	"github.com/gin-gonic/gin"
-) */
-
 import (
-	"backend/internal/code"
-	"backend/internal/compare"
-	"backend/internal/input"
-	"backend/internal/output"
-	"backend/internal/round"
-	"fmt"
+	"backend/game"
 )
 
-/* func main() {
-	r := gin.Default()
-
-	r.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status": "ok",
-		})
-	})
-
-	r.Run()
-}
+/*
+	 var upgrader = websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true // Lasse alle Verbindungen zu (inkl. CORS, eventuell anpassen)
+		},
+	}
 */
-
 func main() {
 
-	start := round.StartRound()
-	running := false
-	c := code.GenerateCode()
-	p := &c
+	game.Game()
 
-	if start {
-		c.CodeString()
-		running = true
-	}
+	/* 	// Register WebSocket Route
+		http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+			handleWebSocketConnection(w, r, gameInstance)
+		})
 
-	for running {
-		fmt.Println("Gib einen Guess ab.")
-		userInput := input.GetUserInput()
-		if input.IsValidGuess(userInput) {
-			if compare.CompareRightGuess(p, userInput) {
-				output.OutputRightGuess()
-				break
-			} else {
-				output.OutputWrongGuess(compare.Compare(p, userInput))
-			}
-		} else {
-			fmt.Println("Falscher Input!")
+		// Starte den HTTP-Server
+		port := "8080"
+		fmt.Printf("WebSocket-Server läuft auf ws://localhost:%s/ws\n", port)
+		if err := http.ListenAndServe(":"+port, nil); err != nil {
+			fmt.Println("Fehler beim Starten des Servers:", err)
 		}
+
 	}
 
+	func handleWebSocketConnection(w http.ResponseWriter, r *http.Request, gameInstance *game.Game) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			fmt.Println("Fehler beim Upgrade der Verbindung:", err)
+			return
+		}
+		defer conn.Close()
+
+		// Hier kannst du Kommunikation mit dem Client behandeln
+		// Das könnte z.B. ein Loop sein, um Nachrichten zu empfangen und zu verarbeiten.
+		for {
+			var msg string
+			// Warte auf eine Nachricht vom Client
+			err := conn.ReadMessage(&msg)
+			if err != nil {
+				fmt.Println("Fehler beim Lesen der Nachricht:", err)
+				break
+			}
+
+			// Hier kannst du die Nachricht verarbeiten und mit der Spiel-Logik kommunizieren
+			gameInstance.ProcessMessage(msg)
+
+			// Sende eine Antwort zurück (optional)
+			if err := conn.WriteMessage(websocket.TextMessage, []byte("Nachricht empfangen: "+msg)); err != nil {
+				fmt.Println("Fehler beim Senden der Nachricht:", err)
+				break
+			}
+		} */
 }

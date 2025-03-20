@@ -15,7 +15,7 @@ func Compare(c *code.Code, userInput string) ComparisonResult {
 
 	for i, r := range userInput {
 		if i < len(c.Value) && r == rune(c.Value[i]) {
-			result.CorrectPositions = append(result.CorrectPositions, i)
+			result.CorrectPositions = append(result.CorrectPositions, i+1)
 		}
 	}
 	return result
