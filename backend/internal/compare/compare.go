@@ -25,3 +25,10 @@ func CompareRightGuess(c *code.Code, userInput string) bool {
 	rightGuess := reflect.DeepEqual(c.Value, userInput)
 	return rightGuess
 }
+
+func EvaluatedGuessIsEmpty() ComparisonResult {
+	cr := ComparisonResult{
+		CorrectPositions: nil,
+	}
+	return cr
+}

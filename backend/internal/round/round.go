@@ -1,10 +1,8 @@
 package round
 
 import (
-	"backend/internal/compare"
 	"backend/internal/input"
 	"backend/internal/level"
-	"backend/internal/output"
 	"fmt"
 	"strings"
 )
@@ -25,7 +23,7 @@ func CreateNewRound(counter int) *Round {
 	return &r
 }
 
-func StartRound() bool {
+/* func StartRound() bool {
 	fmt.Println("Möchtest du die Runde Starten? Y/N")
 	userInput := input.GetUserInput()
 	if strings.Compare(userInput, "Y") == 0 {
@@ -57,7 +55,7 @@ func (r *Round) RoundLoop() {
 		}
 		r.PlayAgain()
 	}
-}
+} */
 
 func (r *Round) UpdateCounter() {
 	r.Counter = r.Counter + 1
