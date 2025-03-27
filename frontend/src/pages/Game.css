@@ -1,0 +1,130 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+body, html {
+    height: 100%;
+    width: 100%;
+    
+
+}
+
+#root {
+    height: 100%;
+    width: 100%;
+    
+  }
+#gameScreen {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: red solid 2px;
+}
+
+.game-div {
+    height: 100vh;
+    background-color: aqua;
+}
+
+.round-div {
+    height: 100vh;
+    background-color: brown;
+}
+
+.gridContainer{
+  height: 96vh;
+  width: 98vw;
+  margin: 1%;
+  display: grid;
+  grid-template-columns: 25% auto 25%;
+  grid-template-rows: 10% 50% 20% 20%;
+  border: green solid 2px;
+}
+
+.gridItem{
+  border: black solid 3px;
+  height: auto;
+  width: auto;
+}
+
+#history {
+  display: flex;
+  flex-direction: column;
+}
+
+#history h1 {
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  display: block;
+  text-align: center;
+}
+
+.submit-history-container {
+  flex-grow: 1;
+}
+
+#lvl{
+  line-height: 1;
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+#lvlDiv{
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+  height: 100%;
+}
+
+#backDiv{
+  display: flex;
+  justify-content: flex-end;
+}
+
+#backButton{
+  margin-right: 5em;
+  height: 3.5em;
+  width: 7em;
+  background-color: hsl(359, 90%, 49%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.3em; 
+  transition: background-color 0.3s; /* Für einen Hover-Effekt */
+}
+
+#backButton:hover{
+  background-color: rgb(191, 26, 26);
+}
+
+#delDiv{
+  display: flex;
+  justify-content: flex-end;
+}
+
+#delButton {
+  margin-top: calc(1.5em / (5/1.3));
+  margin-right: calc(5em / (5/1.3));
+  height: calc(3.5em / (5/1.3));
+  width: calc(7em / (5 / 1.3));
+  background-color: hsl(359, 90%, 49%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 5em; 
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+#delButton:hover{
+  background-color: rgb(191, 26, 26);
+}

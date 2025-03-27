@@ -2,29 +2,32 @@ package level
 
 import (
 	"backend/internal/code"
-	"fmt"
+	"backend/internal/difficulty"
 	"time"
 )
 
 type Level struct {
-	Lvl       int
-	Code      code.Code
-	Solved    bool
-	Trys      int
-	StartTime time.Time
-	EndTime   time.Duration
+	Lvl        int
+	Code       code.Code
+	Solved     bool
+	Trys       int
+	StartTime  time.Time
+	EndTime    time.Duration
+	Difficulty difficulty.Difficulty
 }
 
 func CreateNewLevel(lvl int) Level {
-	c := code.GenerateCode()
+	difficulty := difficulty.GenerateDifficulty(lvl)
+
+	c := code.GenerateCode(difficulty.CodeLength, difficulty.PSC)
 	l := Level{
-		Code:      c,
-		Lvl:       lvl,
-		Solved:    false,
-		Trys:      0,
-		StartTime: time.Now(),
+		Code:       c,
+		Lvl:        lvl,
+		Solved:     false,
+		Trys:       0,
+		StartTime:  time.Now(),
+		Difficulty: difficulty,
 	}
-	fmt.Println("Das aktuelle level ist: ", lvl)
 	return l
 }
 func (l *Level) Endtimer() {

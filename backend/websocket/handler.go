@@ -16,26 +16,31 @@ type StartResponse struct {
 func HandleNewGame(conn *websocket.Conn) {
 	g := game.NewGame()
 	sr := StartResponse{
-		Message: "erstellt",
+		Message: "created",
 		Game:    g,
 	}
 
 	responseJSON, err := json.Marshal(sr)
 	if err != nil {
-		fmt.Println("Fehler beim Serialisieren der Antwort:", err)
+		fmt.Println("Error serializing the message:", err)
 		return
 	}
 	err = conn.WriteMessage(websocket.TextMessage, []byte(responseJSON))
 	if err != nil {
-		fmt.Println("Fehler beim Senden der Nachricht:", err)
+		fmt.Println("Error sending message:", err)
 	}
 }
 
-func HandleStartGame(conn *websocket.Conn, gameInstance *game.Game) {
+func HandleStartRound(conn *websocket.Conn, gameInstance *game.Game) {
 	gameInstance.StartGame()
-	err := conn.WriteMessage(websocket.TextMessage, []byte("Spiel gestartet"))
+	responseJSON, err := json.Marshal(gameInstance.CurrentRound)
 	if err != nil {
-		fmt.Println("Fehler beim Senden der Nachricht:", err)
+		fmt.Println("Error serializing the response:", err)
+	}
+
+	err = conn.WriteMessage(websocket.TextMessage, []byte(responseJSON))
+	if err != nil {
+		fmt.Println("Error sending message:", err)
 	}
 }
 
@@ -44,7 +49,7 @@ func HandleGuess(conn *websocket.Conn, gameInstance *game.Game, guess string) {
 	responseJson := game.SerializeGuessResponse(gameInstance.ClientGuess(guess))
 	err := conn.WriteMessage(websocket.TextMessage, []byte(responseJson))
 	if err != nil {
-		fmt.Println("Fehler beim Senden der Nachricht:", err)
+		fmt.Println("Error sending message:", err)
 	}
 }
 
@@ -53,6 +58,6 @@ func HandleNextLevel(conn *websocket.Conn, gameInstance *game.Game, nextLevel bo
 	responseJson := game.SerializeGuessResponse(gameInstance.NextLevel(nextLevel))
 	err := conn.WriteMessage(websocket.TextMessage, []byte(responseJson))
 	if err != nil {
-		fmt.Println("Fehler beim Senden der Nachricht:", err)
+		fmt.Println("Error sending message", err)
 	}
 }

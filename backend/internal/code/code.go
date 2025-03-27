@@ -11,18 +11,24 @@ import (
 type Code struct {
 	Value string
 	Seed  int64
-	//Length int
-	//Difficulty int
+	Runes []rune
 }
 
-func GenerateCode() Code {
+func GenerateCode(length int, psc int) Code {
+	symbolsCollection, err := randomizer.LoadSymbols("symbols.toml")
+	if err != nil {
+		fmt.Println("Error loading symbols:", err)
+	}
+
 	seed := time.Now().UnixNano()
 	r := rand.New(rand.NewSource(seed))
+	runes := randomizer.GenerateRandomRunes(symbolsCollection, psc)
 
-	codeValue := randomizer.Randomize(r, 4)
+	codeValue := randomizer.Randomize(r, length, runes)
 	return Code{
 		Value: codeValue,
 		Seed:  seed,
+		Runes: runes,
 	}
 }
 

@@ -1,0 +1,27 @@
+TO-DO: (Singel-Player Version)
+
+Font fürs Frontend anpassen für die Symboldarstellung
+
+Neue Evaluationsmethode einbauen ab Level _  
+
+Anzeigen im Frontend der Methode
+
+
+Timer überarbeiten, nimmt zu stark am anfang ab
+
+Timer im frontend einbauen
+
+Timer im backend anpassen
+
+Scoreberechnung und senden anzeigen im Frontend
+
+Berechnung des Highscores am ende der Runde
+
+Datenbankanbindung zum speichern der Highscores
+
+Anzeigen der Highscores im Frontend (top 10)
+
+
+
+Frontend schöner stylen
+

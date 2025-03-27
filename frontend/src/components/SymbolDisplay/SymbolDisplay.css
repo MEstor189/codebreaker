@@ -1,0 +1,26 @@
+.symbol-display {
+    display: flex; 
+    gap: 1em; 
+    height: 6.5em;
+    width: 100%;
+    padding: 1em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding-bottom: 1em;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid hsl(138, 92%, 42%);
+  }
+  
+  .symbol-item {
+    height: 3em;
+    width: 3em;
+    padding: 0; 
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    background-color: #fff; 
+    border: 1px solid hsl(0, 92%, 45%); 
+    border-radius: 4px; 
+    font-size: 1.5em;
+  }

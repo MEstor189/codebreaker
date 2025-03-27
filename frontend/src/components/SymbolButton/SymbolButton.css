@@ -1,0 +1,21 @@
+.symbol-button {
+    background-color: #e68f1e; /* Hintergrundfarbe des Buttons */
+    border: none; /* Kein Rahmen */
+    border-radius: 12px; /* Rundungen an den Ecken */
+    width: 80px; /* Breite des Buttons */
+    height: 80px; /* Höhe des Buttons */
+    display: flex; /* Flexbox, um das symbol zentriert anzuzeigen */
+    justify-content: center;
+    align-items: center;
+    cursor: pointer; /* Zeigt, dass es klickbar ist */
+    transition: background-color 0.3s; /* Für einen Hover-Effekt */
+  }
+  
+  .symbol-button:hover {
+    background-color: #3b077c; /* Hintergrundfarbe bei Hover */
+  }
+  
+  .symbol-image {
+    width: 60%; /* Bildgröße relativ zum Button */
+    height: 60%; /* Bildgröße relativ zum Button */
+  }

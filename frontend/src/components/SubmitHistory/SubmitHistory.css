@@ -1,0 +1,54 @@
+.submit-history {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  border: 1px solid hsl(192, 81%, 36%);
+  padding: 0px;
+  margin: 0px;
+  display: flex;
+  flex-direction: column;
+}
+
+.symbols-container{
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+  
+}
+
+.symbols-array {
+  margin-bottom: 10px;
+  border: black solid 3px;
+  height: 5em;
+  display: flex; 
+  justify-content: flex-start; 
+  align-items: center; 
+  
+
+}
+  
+.symbol-itemHistory {
+  height: 3em;
+  width: 3em;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  border: 1px solid hsl(0, 92%, 45%);
+  font-size: 1.5em;
+}
+
+  .correct-symbol {
+    height: 3em;
+    width: 3em;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #90ee90;
+    border-radius: 3px;
+    border: 1px solid green;
+    font-size: 1.5em;
+  }

@@ -28,16 +28,16 @@ func NewGame() *Game {
 
 func (g *Game) StartGame() {
 	if g.CurrentRound != nil {
-		fmt.Println("Eine Runde läuft bereits.")
+		fmt.Println("Round is running.")
 		return
 	}
-	g.CurrentRound = round.CreateNewRound(0)
-	fmt.Println("Das Spiel hat begonnen!")
+	g.CurrentRound = round.CreateNewRound(1)
+	fmt.Println("Game starts!")
 }
 
 func (g *Game) IsClientInputValid(inputGuess string) bool {
 
-	if input.IsValidGuess(inputGuess) {
+	if input.IsValidGuess(inputGuess, g.CurrentRound.Level.Code.Runes) {
 		g.CurrentRound.Level.Trys = g.CurrentRound.Level.Trys + 1
 		return true
 	} else {
@@ -48,11 +48,14 @@ func (g *Game) IsClientInputValid(inputGuess string) bool {
 func (g *Game) ClientGuess(clientInput string) GuessResponse {
 	if g.IsClientInputValid(clientInput) {
 
+		l := compare.CompareNormalMode(&g.CurrentRound.Level.Code, clientInput)
+		fmt.Println(l)
+
 		if compare.CompareRightGuess(&g.CurrentRound.Level.Code, clientInput) {
-			evaluatedGuess := compare.Compare(&g.CurrentRound.Level.Code, clientInput)
+			evaluatedGuess := compare.CompareEasyMode(&g.CurrentRound.Level.Code, clientInput)
 			solved := true
 			g.CurrentRound.Level.Endtimer()
-			message := "Das war richtig"
+			message := "Correct Guess"
 			gr := GuessResponse{
 				Message:        message,
 				Solved:         solved,
@@ -61,9 +64,9 @@ func (g *Game) ClientGuess(clientInput string) GuessResponse {
 			}
 			return gr
 		} else {
-			evaluatedGuess := compare.Compare(&g.CurrentRound.Level.Code, clientInput)
+			evaluatedGuess := compare.CompareEasyMode(&g.CurrentRound.Level.Code, clientInput)
 			solved := false
-			message := "Probier es nochmal"
+			message := "Try Again"
 			gr := GuessResponse{
 				Message:        message,
 				Solved:         solved,
@@ -86,8 +89,9 @@ func (g *Game) ClientGuess(clientInput string) GuessResponse {
 func (g *Game) NextLevel(again bool) GuessResponse {
 
 	if again {
+		g.CurrentRound.UpdateCounter()
 		g.CurrentRound.Level = level.CreateNewLevel(g.CurrentRound.Counter)
-		message := "neues level"
+		message := "New Level"
 		solved := false
 		evaluatedGuess := compare.EvaluatedGuessIsEmpty()
 
@@ -99,7 +103,7 @@ func (g *Game) NextLevel(again bool) GuessResponse {
 		}
 		return gr
 	} else {
-		message := "kein neues level"
+		message := "no new level"
 		solved := true
 		evaluatedGuess := compare.EvaluatedGuessIsEmpty()
 
@@ -118,19 +122,9 @@ func SerializeGuessResponse(response GuessResponse) []byte {
 
 	responseJSON, err := json.Marshal(response)
 	if err != nil {
-		fmt.Println("Fehler beim Serialisieren der Antwort:", err)
+		fmt.Println("Error serializing the response:", err)
 		return nil
 	}
 	return responseJSON
 
 }
-
-/* func Game() {
-	start := round.StartRound()
-
-	if start {
-		r := round.CreateNewRound(0)
-		r.RoundLoop()
-	}
-
-} */

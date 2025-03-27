@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/websocket"
 )
@@ -26,8 +27,12 @@ type Manager struct {
 }
 
 type Message struct {
-	Type    string `json:"type"`
-	Content string `json:"content"`
+	Type    string          `json:"type"`
+	Payload json.RawMessage `json:"payload"`
+}
+
+type GuessContent struct {
+	PressedSymbols []string `json:"pressedSymbols"`
 }
 
 func StartWebSocketServer() {
@@ -39,14 +44,14 @@ func StartWebSocketServer() {
 		handleWebSocketConnection(w, r, manager)
 	})
 
-	fmt.Println("WebSocket-Server läuft...")
+	fmt.Println("WebSocket-Server is running...")
 
 }
 
 func handleWebSocketConnection(w http.ResponseWriter, r *http.Request, manager *Manager) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		fmt.Println("Fehler beim Upgrade der Verbindung:", err)
+		fmt.Println("Error upgrading connection:", err)
 		return
 	}
 	defer conn.Close()
@@ -57,16 +62,15 @@ func handleWebSocketConnection(w http.ResponseWriter, r *http.Request, manager *
 	}
 	manager.Clients[client] = true
 
-	// Kommunikationsloop für den Client
 	for {
-		// Warte auf eine Nachricht vom Client
+
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
-			fmt.Println("Fehler beim Lesen der Nachricht:", err)
+			fmt.Println("Error loadung message:", err)
 			break
 		}
+		fmt.Println("Message:", string(msg))
 
-		// Rufe die processMessage-Funktion auf, um die eingehende Nachricht zu verarbeiten
 		ProcessMessage(client, manager, msg)
 	}
 }
@@ -76,23 +80,30 @@ func ProcessMessage(client *Client, manager *Manager, msg []byte) {
 
 	err := json.Unmarshal(msg, &incomingMessage)
 	if err != nil {
-		fmt.Println("Ungültige Nachricht:", err)
+		fmt.Println("Invalid Message:", err)
 		return
 	}
 
-	// Nutze den Type der Nachricht, um zu entscheiden, was zu tun ist
 	switch incomingMessage.Type {
+
 	case "start":
-		HandleStartGame(client.Conn, client.GameInstance)
+		HandleStartRound(client.Conn, client.GameInstance)
 		fmt.Println(client.Conn.RemoteAddr().String())
 
 	case "guess":
-		HandleGuess(client.Conn, client.GameInstance, incomingMessage.Content)
+		var guessContent GuessContent
+		err := json.Unmarshal(incomingMessage.Payload, &guessContent)
+		if err != nil {
+			fmt.Println("Error parsing 'guess'-data:", err)
+			return
+		}
+		symbolsString := strings.Join(guessContent.PressedSymbols, "")
+		HandleGuess(client.Conn, client.GameInstance, symbolsString)
 
-	case "test":
+	case "nextLevel":
 		HandleNextLevel(client.Conn, client.GameInstance, true)
 
 	default:
-		fmt.Println("Unbekannter Nachrichtentyp:", incomingMessage.Type)
+		fmt.Println("Unknown Messagetype:", incomingMessage.Type)
 	}
 }
