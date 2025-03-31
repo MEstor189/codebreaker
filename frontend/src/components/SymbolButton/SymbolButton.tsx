@@ -1,9 +1,9 @@
-import React from 'react';
-import './SymbolButton.css';
+import React from "react";
+import "./SymbolButton.css";
 
 interface SymbolButtonProps {
-  symbol: string; // Der Pfad zum Symbol
-  onClick: () => void; // Callback-Funktion für Klick-Ereignis
+  symbol: string;
+  onClick?: () => void;
 }
 
 const SymbolButton: React.FC<SymbolButtonProps> = ({ symbol, onClick }) => {

@@ -6,6 +6,9 @@ interface SubmitHistoryProps {
   submittedHistory: { symbols: string[], correctPositions: number[] }[];
 }
 
+const MAX_ROWS = 7;
+const MAX_SYMBOLS = 4;
+
 const SubmitHistory: React.FC<SubmitHistoryProps> = ({ submittedHistory }) => {
   const historyRef = useRef<HTMLDivElement>(null);
 
@@ -15,30 +18,32 @@ const SubmitHistory: React.FC<SubmitHistoryProps> = ({ submittedHistory }) => {
     }
   }, [submittedHistory]);
 
+  const filledHistory = [
+    ...submittedHistory,
+    ...Array(Math.max(0, MAX_ROWS - submittedHistory.length)).fill({ symbols: Array(MAX_SYMBOLS).fill(null) }),
+  ];
+
   return (
-    <div className="submit-history">
-      <div ref={historyRef} className="symbols-container">
-        {submittedHistory.map((entry, index) => (
-          <div key={index} className="symbols-array">
-            {entry.symbols.map((symbol, index2) => {
-              const isCorrect = entry.correctPositions.includes(index2 + 1);
-              return (
-                <span
-                  key={index2}
-                  className="symbol-itemHistory"
-                  style={{
-                    marginRight: "5px",
-                    backgroundColor: isCorrect ? "green" : "transparent",
-                    color: isCorrect ? "white" : "black",
-                  }}
-                >
-                  {symbol}
-                </span>
-              );
-            })}
+    <div className="submit-history" ref={historyRef}>
+      {filledHistory.map((entry, index) => (
+        <div key={index} className="history-row">
+
+          <div className={`history-box left-box ${entry.symbols.some((s: any) => s) ? '' : 'placeholder-box'}`}> 
+                {entry.symbols.some((s: any) => s) ? 'L' : ''}
           </div>
-        ))}
-      </div>
+
+          <div className="symbols-array">
+            {entry.symbols.map((symbol: any, index2: React.Key | null | undefined) => (
+              <span key={index2} className={`symbol-itemHistory ${symbol ? '' : 'placeholder'}`}>
+                {symbol || ''}
+              </span>
+            ))}
+          </div>
+          <div className={`history-box right-box ${entry.symbols.some((s: any) => s) ? '' : 'placeholder-box'}`}> 
+                {entry.symbols.some((s: any) => s) ? 'R' : ''}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

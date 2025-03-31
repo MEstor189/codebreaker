@@ -4,8 +4,11 @@ import './Game.css';
 import SymbolDisplay from '../components/SymbolDisplay/SymbolDisplay';
 import SubmitButton from '../components/SubmitButton/SubmitButton';
 import SubmitHistory from '../components/SubmitHistory/SubmitHistory';
-import ButtonLeiste from '../components/SymbolButtonField/SymbolButtonField';
+import SymbolButtonField from '../components/SymbolButtonField/SymbolButtonField';
 import { useWebSocket } from '../components/WebSocket/WebSocketContext';
+import SymbolButton from '../components/SymbolButton/SymbolButton';
+
+import { BsBoxArrowLeft } from "react-icons/bs";
 
 
 const Game: React.FC = () => {
@@ -15,14 +18,14 @@ const Game: React.FC = () => {
   const { isConnected, sendMessage } = useWebSocket();
   const [loadingRound, setLoadingRound] = useState(true);
   const [roundObj, setRoundObj] = useState<any>(null); 
-  const [isNextButtonVisible, setIsNextButtonVisible] = useState(false);
+  const [isNextButtonVisible, setIsNextButtonVisible] = useState(false); 
 
-  const handleSymbolClick = (symbol: string) => {
+   const handleSymbolClick = (symbol: string) => {
     setPressedSymbols(prevSymbols => [...prevSymbols, symbol]);
-  };
+  }; 
 
-  const handleRemoveLastSymbol = () => {
-    setPressedSymbols(prevSymbols => prevSymbols.slice(0, -1));
+  const handleRemoveSymbol = (index: number) => {
+    setPressedSymbols((prevSymbols) => prevSymbols.filter((_, i) => i !== index));
   };
 
 
@@ -110,39 +113,51 @@ const Game: React.FC = () => {
     }
   }, [roundObj]);
 
+  useEffect(() => {
+    if (roundObj && roundObj.Level && pressedSymbols.length === roundObj.Level.Difficulty.CodeLength) {
+      handleSubmit();
+    }
+  }, [pressedSymbols, roundObj]);
+
+  
   return (
-    <div id='gameScreen'>
-      <div className='gridContainer'>
-        <div className='gridItem' ></div>
-        <div className='gridItem' id='lvlDiv'>
-          <h1 id='lvl' >Level: {loadingRound ? "Lade..." : roundObj ? roundObj.Level.Lvl : 0}</h1>
-        </div>
-        <div className='gridItem' ></div>
-        <div className='gridItem' ></div>
-        <div className='gridItem' id='history'>
-          <h1>Submitted Symbols History</h1>
-          <SubmitHistory submittedHistory={submittedHistory} />
-        </div>
-        <div className='gridItem' ></div>
-        <div className='gridItem'id='delDiv' >
-          <button id='delButton' onClick={handleRemoveLastSymbol}>⬅</button>
-        </div>
-        <div className='gridItem' id='displayDiv' >
-          <SymbolDisplay symbols={pressedSymbols} />
-        </div>
-        <div className='gridItem' >
-          <SubmitButton onClick={handleSubmit} />
-        </div>
-        <div className='gridItem'id='backDiv' >
-          <button id='backButton' onClick={goToStartScreen}>Back to Start </button>
-        </div>
-        <div className='gridItem' >
-          <ButtonLeiste symbols={loadingRound? "Lade..." : roundObj.Level.Code.Runes} count={loadingRound? "": roundObj.Level.Difficulty.PSC} onClick={handleSymbolClick}></ButtonLeiste>
-        </div>
-        <div className='gridItem' >
-          {isNextButtonVisible && <button onClick={handleNextLevel} >Next Level</button>}
+    <div className="game-container">
+      <div className="left">
+        <button id='homeButton'>
+        <BsBoxArrowLeft onClick={goToStartScreen} />
+        </button>
+
+      </div>
+      <div className="center">
+        <div className="content">
+          <div className="game-info-bar">
+            <div className="info-item">
+              <span className="info-label">Level</span>
+              <span className="info-value">{loadingRound ? "Lade..." : roundObj ? roundObj.Level.Lvl : 0}</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Timer</span>
+              <span className="info-value">XX:XX</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Score</span>
+              <span className="info-value">XXXX</span>
+
+            </div>
+          </div>
+          <div className='history'>
+              <SubmitHistory submittedHistory={submittedHistory}></SubmitHistory>
+          </div>
+          <div className='display'>
+            <SymbolDisplay symbols={pressedSymbols} onRemove={handleRemoveSymbol}></SymbolDisplay>
+
+          </div>
+          <div className="symbol-button-field-wrapper">
+            <SymbolButtonField symbols={loadingRound? "Lade..." : roundObj.Level.Code.Runes} count={loadingRound? "": roundObj.Level.Difficulty.PSC} onClick={handleSymbolClick}  />
+          </div>
         </div>
       </div>
+      <div className="right"></div>
     </div>
   );
 };

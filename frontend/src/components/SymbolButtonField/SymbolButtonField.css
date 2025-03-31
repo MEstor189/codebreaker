@@ -1,0 +1,34 @@
+.symbol-button-field {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%; 
+    padding: 1%;
+
+  }
+  
+  /* Anpassung für spezifische Layouts mit 5 oder mehr Buttons */
+  @media (min-width: 300px) and (max-width: 800px) {
+    .symbol-button-field {
+      grid-template-columns: repeat(5, 1fr); /* Bis 5 Buttons nebeneinander */
+    }
+  }
+  
+  @media (min-width: 801px) {
+    .symbol-button-field {
+      grid-template-columns: repeat(5, 1fr); /* Bis 5 Buttons nebeneinander */
+    }
+  }
+  
+  /* Optional: Anpassung für größere Button-Anzahl */
+  @media (min-width: 1000px) {
+    .symbol-button-field {
+      grid-template-columns: repeat(8, 1fr);
+    }
+  }
+
+
+  

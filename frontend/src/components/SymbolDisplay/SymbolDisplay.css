@@ -1,26 +1,40 @@
 .symbol-display {
-    display: flex; 
-    gap: 1em; 
-    height: 6.5em;
-    width: 100%;
-    padding: 1em;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    padding-bottom: 1em;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    border: 1px solid hsl(138, 92%, 42%);
-  }
+  width: 90%;
+  height: 11vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0;
+}
+
+.symbol-item {
+  width: 5.5vw; 
+  height: 8.5vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #BFBAB5;
+  color: black;
+  font-size: 1.8rem;
+  font-weight: bold;
+  border-radius: 10px;
+  margin-right: 0.5rem;
+  cursor: pointer;
   
-  .symbol-item {
-    height: 3em;
-    width: 3em;
-    padding: 0; 
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-    background-color: #fff; 
-    border: 1px solid hsl(0, 92%, 45%); 
-    border-radius: 4px; 
-    font-size: 1.5em;
-  }
+
+}
+
+.symbol-item:hover{
+  background-color: #48464C;
+  color: white;
+}
+
+.placeholder-display {
+  border: 1px dotted black;
+  background-color: #BFBAB5;
+  opacity: 0.2;
+}
+.placeholder-display:hover {
+  background-color:#BFBAB5 ;
+}

@@ -1,54 +1,91 @@
 .submit-history {
   width: 100%;
+  padding-left: 2%;
+  padding-right: 2%;
+  border-radius: 10px;
+
+  max-height: 100%;
   height: 100%;
-  overflow-y: auto;
-  border: 1px solid hsl(192, 81%, 36%);
-  padding: 0px;
-  margin: 0px;
+  overflow-y: auto; 
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+
+.submit-history::-webkit-scrollbar {
+  display: none;
+}
+
+.symbols-container {
   display: flex;
   flex-direction: column;
-}
-
-.symbols-container{
-  flex-grow: 1;
-  overflow-y: auto;
-  padding-right: 10px;
-  
-}
-
-.symbols-array {
-  margin-bottom: 10px;
-  border: black solid 3px;
-  height: 5em;
-  display: flex; 
-  justify-content: flex-start; 
-  align-items: center; 
-  
+  gap: 0.5rem;
 
 }
-  
-.symbol-itemHistory {
-  height: 3em;
-  width: 3em;
-  padding: 0;
+
+.history-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.5rem;
+
+}
+
+.history-box {
+  background-color: #BFBAB5;
+  color: #000000;
+  width: 4vw;
+  height: 7vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f0f0f0;
-  border-radius: 3px;
-  border: 1px solid hsl(0, 92%, 45%);
-  font-size: 1.5em;
+
+  font-weight: bold;
 }
 
-  .correct-symbol {
-    height: 3em;
-    width: 3em;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #90ee90;
-    border-radius: 3px;
-    border: 1px solid green;
-    font-size: 1.5em;
-  }
+.left-box {
+  margin-right: 2%;
+  width: 8%;
+  border-radius: 25px 5px 5px 25px;
+}
+
+.right-box {
+  margin-left: 2%;
+  width: 8%;
+  border-radius: 5px 25px 25px 5px;
+
+}
+
+.symbols-array {
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem; 
+}
+
+.symbol-itemHistory {
+  width: 5.5vw;
+  height: 7vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #48464C;
+  color: rgb(255, 255, 255); 
+  font-size: 1.6rem;
+  font-weight: bold;
+  border-radius: 5px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.placeholder {
+  opacity: 0.2;
+  background-color: #48464C;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.placeholder-box {
+  opacity: 0.2;
+  background-color: #BFBAB5;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
