@@ -12,8 +12,9 @@ type Level struct {
 	Solved     bool
 	Trys       int
 	StartTime  time.Time
-	EndTime    time.Duration
+	EndTime    int
 	Difficulty difficulty.Difficulty
+	LvLScore   int64
 }
 
 func CreateNewLevel(lvl int) Level {
@@ -27,10 +28,15 @@ func CreateNewLevel(lvl int) Level {
 		Trys:       0,
 		StartTime:  time.Now(),
 		Difficulty: difficulty,
+		LvLScore:   0,
 	}
 	return l
 }
 func (l *Level) Endtimer() {
 	timer := l.StartTime
-	l.EndTime = time.Since(timer)
+	l.EndTime = int(time.Since(timer).Seconds())
+}
+
+func (l *Level) StartTimer() {
+	l.StartTime = time.Now()
 }

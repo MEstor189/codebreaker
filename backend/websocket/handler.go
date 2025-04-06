@@ -1,7 +1,9 @@
 package websocket
 
 import (
+	"backend/db"
 	"backend/game"
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -33,12 +35,9 @@ func HandleNewGame(conn *websocket.Conn) {
 
 func HandleStartRound(conn *websocket.Conn, gameInstance *game.Game) {
 	gameInstance.StartGame()
-	responseJSON, err := json.Marshal(gameInstance.CurrentRound)
-	if err != nil {
-		fmt.Println("Error serializing the response:", err)
-	}
 
-	err = conn.WriteMessage(websocket.TextMessage, []byte(responseJSON))
+	responseJSON := game.SerializeStartResponse(gameInstance.CurrentRound)
+	err := conn.WriteMessage(websocket.TextMessage, []byte(responseJSON))
 	if err != nil {
 		fmt.Println("Error sending message:", err)
 	}
@@ -60,4 +59,21 @@ func HandleNextLevel(conn *websocket.Conn, gameInstance *game.Game, nextLevel bo
 	if err != nil {
 		fmt.Println("Error sending message", err)
 	}
+}
+
+func HandleHighscoreEntry(conn *websocket.Conn, gameInstance *game.Game, playername string, score int) {
+	connDB, err := db.ConnectDB()
+	if err != nil {
+		panic(err)
+	}
+	defer connDB.Close(context.Background())
+
+	he := db.CreateHighscoreEntry(playername, score)
+	err = db.InsertHighscore(connDB, he)
+	if err != nil {
+		fmt.Errorf("Error inserting: %w", err)
+	} else {
+		fmt.Println("Highscore etnry inserted!")
+	}
+
 }

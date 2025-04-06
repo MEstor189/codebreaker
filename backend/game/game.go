@@ -2,18 +2,18 @@ package game
 
 import (
 	"backend/internal/compare"
+	"backend/internal/dto"
 	"backend/internal/input"
 	"backend/internal/level"
 	"backend/internal/round"
+	"backend/internal/score"
 	"encoding/json"
 	"fmt"
 )
 
 type GuessResponse struct {
-	Message        string                   `json:"message"`
-	Solved         bool                     `json:"solved"`
-	EvaluatedGuess compare.ComparisonResult `json:"evaluatedGuess"`
-	Roundstate     round.Round              `json:"roundstate"`
+	Message string        `json:"message"`
+	State   dto.ServerDTO `json:"state"`
 }
 
 type Game struct {
@@ -39,6 +39,9 @@ func (g *Game) IsClientInputValid(inputGuess string) bool {
 
 	if input.IsValidGuess(inputGuess, g.CurrentRound.Level.Code.Runes) {
 		g.CurrentRound.Level.Trys = g.CurrentRound.Level.Trys + 1
+		if g.CurrentRound.Level.Trys == 1 {
+			g.CurrentRound.Level.StartTimer()
+		}
 		return true
 	} else {
 		return false
@@ -48,39 +51,39 @@ func (g *Game) IsClientInputValid(inputGuess string) bool {
 func (g *Game) ClientGuess(clientInput string) GuessResponse {
 	if g.IsClientInputValid(clientInput) {
 
-		l := compare.CompareNormalMode(&g.CurrentRound.Level.Code, clientInput)
-		fmt.Println(l)
-
 		if compare.CompareRightGuess(&g.CurrentRound.Level.Code, clientInput) {
-			evaluatedGuess := compare.CompareEasyMode(&g.CurrentRound.Level.Code, clientInput)
+			evaluatedGuess := compare.CompareNormalMode(&g.CurrentRound.Level.Code, clientInput)
 			solved := true
 			g.CurrentRound.Level.Endtimer()
+
+			fmt.Println(g.CurrentRound.Level.EndTime)
+			fmt.Println(g.CurrentRound.Level.Difficulty.Timer)
+			g.CurrentRound.Level.LvLScore = score.CalculateScore(g.CurrentRound.Level.Lvl, g.CurrentRound.Level.Trys, g.CurrentRound.Level.EndTime, int(g.CurrentRound.Level.Difficulty.Timer))
+			g.CurrentRound.RoundScore += g.CurrentRound.Level.LvLScore
+
+			dto := dto.GenerateDTO(g.CurrentRound, solved, evaluatedGuess)
 			message := "Correct Guess"
 			gr := GuessResponse{
-				Message:        message,
-				Solved:         solved,
-				EvaluatedGuess: evaluatedGuess,
-				Roundstate:     *g.CurrentRound,
+				Message: message,
+				State:   dto,
 			}
 			return gr
 		} else {
-			evaluatedGuess := compare.CompareEasyMode(&g.CurrentRound.Level.Code, clientInput)
+			evaluatedGuess := compare.CompareNormalMode(&g.CurrentRound.Level.Code, clientInput)
 			solved := false
+			dto := dto.GenerateDTO(g.CurrentRound, solved, evaluatedGuess)
 			message := "Try Again"
 			gr := GuessResponse{
-				Message:        message,
-				Solved:         solved,
-				EvaluatedGuess: evaluatedGuess,
-				Roundstate:     *g.CurrentRound,
+				Message: message,
+				State:   dto,
 			}
 			return gr
 		}
 	} else {
+		dto := dto.GenerateDTO(g.CurrentRound, false, compare.EvaluatedGuessIsEmpty())
 		gr := GuessResponse{
-			Message:        "invalid guess",
-			Solved:         false,
-			EvaluatedGuess: compare.EvaluatedGuessIsEmpty(),
-			Roundstate:     *g.CurrentRound,
+			Message: "invalid guess",
+			State:   dto,
 		}
 		return gr
 	}
@@ -94,24 +97,22 @@ func (g *Game) NextLevel(again bool) GuessResponse {
 		message := "New Level"
 		solved := false
 		evaluatedGuess := compare.EvaluatedGuessIsEmpty()
+		dto := dto.GenerateDTO(g.CurrentRound, solved, evaluatedGuess)
 
 		gr := GuessResponse{
-			Message:        message,
-			Solved:         solved,
-			EvaluatedGuess: evaluatedGuess,
-			Roundstate:     *g.CurrentRound,
+			Message: message,
+			State:   dto,
 		}
 		return gr
 	} else {
 		message := "no new level"
 		solved := true
 		evaluatedGuess := compare.EvaluatedGuessIsEmpty()
+		dto := dto.GenerateDTO(g.CurrentRound, solved, evaluatedGuess)
 
 		gr := GuessResponse{
-			Message:        message,
-			Solved:         solved,
-			EvaluatedGuess: evaluatedGuess,
-			Roundstate:     *g.CurrentRound,
+			Message: message,
+			State:   dto,
 		}
 		return gr
 	}
@@ -126,5 +127,16 @@ func SerializeGuessResponse(response GuessResponse) []byte {
 		return nil
 	}
 	return responseJSON
+}
 
+func SerializeStartResponse(response *round.Round) []byte {
+
+	dto := dto.GenerateDTO(response, false, compare.EvaluatedGuessIsEmpty())
+
+	responseJSON, err := json.Marshal(dto)
+	if err != nil {
+		fmt.Println("Error serializing the response:", err)
+		return nil
+	}
+	return responseJSON
 }

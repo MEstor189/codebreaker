@@ -1,12 +1,19 @@
 package main
 
 import (
+	"backend/db"
 	"backend/websocket"
 	"fmt"
+	"log"
 	"net/http"
 )
 
 func main() {
+
+	if err := db.InitDB(); err != nil {
+		log.Fatalf("DB init error: %v", err)
+	}
+	fmt.Println("DB connected!")
 
 	websocket.StartWebSocketServer()
 

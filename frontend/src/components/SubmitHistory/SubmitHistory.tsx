@@ -1,9 +1,15 @@
 
 import './SubmitHistory.css';
-import React, { useState, useRef, useLayoutEffect } from "react";
+import React, { useRef, useLayoutEffect } from "react";
+
+export interface SubmittedHistoryEntry {
+  symbols: string[]; // Ein einzelner Symbolstring
+  correctPositions: number; // Die korrekte Position
+  correctCount: number; // Die Anzahl der richtigen Antworten
+}
 
 interface SubmitHistoryProps {
-  submittedHistory: { symbols: string[], correctPositions: number[] }[];
+  submittedHistory: SubmittedHistoryEntry[]; 
 }
 
 const MAX_ROWS = 7;
@@ -20,7 +26,7 @@ const SubmitHistory: React.FC<SubmitHistoryProps> = ({ submittedHistory }) => {
 
   const filledHistory = [
     ...submittedHistory,
-    ...Array(Math.max(0, MAX_ROWS - submittedHistory.length)).fill({ symbols: Array(MAX_SYMBOLS).fill(null) }),
+    ...Array(Math.max(0, MAX_ROWS - submittedHistory.length)).fill({ symbols: Array(MAX_SYMBOLS).fill(null), correctPositions: 0, correctCount: 0 }),
   ];
 
   return (
@@ -29,7 +35,7 @@ const SubmitHistory: React.FC<SubmitHistoryProps> = ({ submittedHistory }) => {
         <div key={index} className="history-row">
 
           <div className={`history-box left-box ${entry.symbols.some((s: any) => s) ? '' : 'placeholder-box'}`}> 
-                {entry.symbols.some((s: any) => s) ? 'L' : ''}
+                {entry.symbols.some((s: any) => s) ? entry.correctPositions : ''}
           </div>
 
           <div className="symbols-array">
@@ -40,7 +46,7 @@ const SubmitHistory: React.FC<SubmitHistoryProps> = ({ submittedHistory }) => {
             ))}
           </div>
           <div className={`history-box right-box ${entry.symbols.some((s: any) => s) ? '' : 'placeholder-box'}`}> 
-                {entry.symbols.some((s: any) => s) ? 'R' : ''}
+                {entry.symbols.some((s: any) => s) ? entry.correctCount : ''}
           </div>
         </div>
       ))}

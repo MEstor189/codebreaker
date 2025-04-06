@@ -23,8 +23,19 @@ func LoadSymbols(filename string) ([]string, error) {
 func GenerateRandomRunes(symbols []string, size int) []rune {
 	randomRunes := make([]rune, size)
 	rand.Seed(time.Now().UnixNano())
+
+	usedIndexes := make(map[int]struct{})
+
 	for i := 0; i < size; i++ {
-		randomIndex := rand.Intn(len(symbols))
+		var randomIndex int
+		for {
+			randomIndex = rand.Intn(len(symbols))
+			if _, exists := usedIndexes[randomIndex]; !exists {
+				break
+			}
+		}
+
+		usedIndexes[randomIndex] = struct{}{}
 		randomRunes[i] = []rune(symbols[randomIndex])[0]
 	}
 	return randomRunes

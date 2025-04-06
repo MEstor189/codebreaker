@@ -61,9 +61,10 @@ func CompareRightGuess(c *code.Code, userInput string) bool {
 	return rightGuess
 }
 
-func EvaluatedGuessIsEmpty() ComparisonResult {
-	cr := ComparisonResult{
-		CorrectPositions: nil,
+func EvaluatedGuessIsEmpty() ComparisonResultNormal {
+	cr := ComparisonResultNormal{
+		Contains:  0,
+		Positions: 0,
 	}
 	return cr
 }

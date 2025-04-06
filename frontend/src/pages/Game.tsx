@@ -2,23 +2,33 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Game.css';
 import SymbolDisplay from '../components/SymbolDisplay/SymbolDisplay';
-import SubmitButton from '../components/SubmitButton/SubmitButton';
-import SubmitHistory from '../components/SubmitHistory/SubmitHistory';
+import SubmitHistory, { SubmittedHistoryEntry } from '../components/SubmitHistory/SubmitHistory';
 import SymbolButtonField from '../components/SymbolButtonField/SymbolButtonField';
 import { useWebSocket } from '../components/WebSocket/WebSocketContext';
-import SymbolButton from '../components/SymbolButton/SymbolButton';
 
 import { BsBoxArrowLeft } from "react-icons/bs";
+import SolvedPopUp from '../components/PopUp/SolvedPopUp';
+import Timer from '../components/timer/timer';
+import EndRoundPopUp from '../components/PopUp/EndRoundPopUp';
 
 
 const Game: React.FC = () => {
   const navigate = useNavigate();
   const [pressedSymbols, setPressedSymbols] = useState<string[]>([]);
-  const [submittedHistory, setSubmittedHistory] = useState<{ symbols: string[]; correctPositions: number[] }[]>([]);
-  const { isConnected, sendMessage } = useWebSocket();
+  const [submittedHistory, setSubmittedHistory] = useState<SubmittedHistoryEntry[]>([]);
+  const { sendMessage } = useWebSocket();
   const [loadingRound, setLoadingRound] = useState(true);
   const [roundObj, setRoundObj] = useState<any>(null); 
-  const [isNextButtonVisible, setIsNextButtonVisible] = useState(false); 
+  const [ ,setIsNextButtonVisible] = useState(false);
+  const [ ,setPopupOpen] = useState(false);
+  const [timerValue, setTimerValue] = useState(0);
+  const [timerStarted, setTimerStarted] = useState(false);
+  const [remainingTime, setRemainingTime] = useState<number>(0);
+  const [score, setScore] = useState<string>("0")
+  const [roundScore, setRoundScore] = useState<string>("0")
+  const [lvlCleared, setLevelCleared] = useState(false);
+  const [showEndRoundPopUp, setShowEndRoundPopUp] = useState(false)
+
 
    const handleSymbolClick = (symbol: string) => {
     setPressedSymbols(prevSymbols => [...prevSymbols, symbol]);
@@ -28,8 +38,8 @@ const Game: React.FC = () => {
     setPressedSymbols((prevSymbols) => prevSymbols.filter((_, i) => i !== index));
   };
 
-
   const handleSubmit = async () => {
+
     if (pressedSymbols.length === 0) {
       console.warn("Leere Eingabe – Guess wird nicht abgeschickt.");
       return; 
@@ -43,10 +53,17 @@ const Game: React.FC = () => {
 
         const data = typeof response === "string" ? JSON.parse(response) : response;
 
-        const correctPositions = data?.evaluatedGuess?.CorrectPositions ?? [];
-        correctGuess(data.solved )
+        setRoundObj(data.state)
+        setTimerStarted(true)
 
-        setSubmittedHistory(prevHistory => [...prevHistory, { symbols: pressedSymbols, correctPositions }]);
+        correctGuess(data.state.Solved )
+
+        setSubmittedHistory(prevHistory => [...prevHistory, { 
+          symbols: pressedSymbols,
+          correctPositions: data?.state?.ComparisonResultNormal?.Positions ?? 0,
+          correctCount:data?.state?.ComparisonResultNormal?.Contains ?? 0
+        }
+      ]);
 
     } catch (error) {
         console.error("Fehler beim Senden der Startnachricht:", error);
@@ -59,11 +76,16 @@ const Game: React.FC = () => {
   }
 
   const handleNextLevel = async () => {
+    console.log("neue runde")
     setLoadingRound(true)
+    setLevelCleared(false)
     try{
       const response = await sendMessage("nextLevel", { nextLevel:true  });
       const data = typeof response === "string" ? JSON.parse(response) : response;
-      setRoundObj(data.roundstate)
+      console.log("Response: ",response)
+      setRoundObj(data.state)
+
+      console.log("Obj: ",roundObj)
       setLoadingRound(false)
       setSubmittedHistory([]);
       setIsNextButtonVisible(false)
@@ -78,11 +100,15 @@ const Game: React.FC = () => {
 
   const correctGuess = async (solved: Boolean) => {
     if(solved){
-      setIsNextButtonVisible(true);
+      setLevelCleared(true) 
+
     }else{
       setIsNextButtonVisible(false);
+      setPopupOpen(false)
+
     }
   }
+
 
 
   const startRound = async () => {
@@ -99,25 +125,65 @@ const Game: React.FC = () => {
     }
   };
 
+  const handleTimeLeftChange = (timeLeft: number) => {
+    setRemainingTime(timeLeft);
+  };
+
   useEffect(() => {
     const startGame = async () => {
-      await startRound(); 
+      await startRound();
+       
     };
     startGame();
   }, []); 
 
 
   useEffect(() => {
-    if (roundObj !== null) {
-      console.log("Aktualisiertes GameObj:", roundObj); 
+    if (roundObj !== null && !lvlCleared) {
+      setTimerValue(Number(roundObj.Difficulty.Timer));
+      setRemainingTime(timerValue)
     }
   }, [roundObj]);
 
   useEffect(() => {
-    if (roundObj && roundObj.Level && pressedSymbols.length === roundObj.Level.Difficulty.CodeLength) {
+    if (roundObj && roundObj.Level && pressedSymbols.length === roundObj.Difficulty.CodeLength) {
       handleSubmit();
     }
   }, [pressedSymbols, roundObj]);
+
+  useEffect(() => {
+    if (lvlCleared) {
+      setScore(roundObj.LvLScore)
+      setRoundScore(roundObj.RoundScore)
+      setIsNextButtonVisible(true);
+      setPopupOpen(true)
+      setTimerStarted(false)
+      console.log(score)
+    }
+}, [lvlCleared]);
+
+
+const handleNameSubmit = async (name: string, score: string) => {
+  console.log("neue runde")
+  try{
+    const response = await sendMessage("highscoreEntry", {name,score});
+    console.log("Submit: ",response)
+  }catch (error){
+
+    console.error(error)
+  }
+  console.log("Eingegebener Name:", name);
+};
+
+const goToEndPopUp = () => {
+  setShowEndRoundPopUp(true);
+};
+
+
+
+
+  const isLoading = loadingRound ? "Lade" : null;
+
 
   
   return (
@@ -133,15 +199,21 @@ const Game: React.FC = () => {
           <div className="game-info-bar">
             <div className="info-item">
               <span className="info-label">Level</span>
-              <span className="info-value">{loadingRound ? "Lade..." : roundObj ? roundObj.Level.Lvl : 0}</span>
+              <span className="info-value">{loadingRound ? "Lade..." : roundObj ? roundObj.Level : 0}</span>
             </div>
             <div className="info-item">
               <span className="info-label">Timer</span>
-              <span className="info-value">XX:XX</span>
+              {timerStarted && (
+              <Timer 
+              initialTime={timerValue}
+              onExpire={undefined}
+              onTimeLeftChange={handleTimeLeftChange}
+              />)}
+              
             </div>
             <div className="info-item">
               <span className="info-label">Score</span>
-              <span className="info-value">XXXX</span>
+              <span className="info-value">{roundScore}</span>
 
             </div>
           </div>
@@ -153,8 +225,20 @@ const Game: React.FC = () => {
 
           </div>
           <div className="symbol-button-field-wrapper">
-            <SymbolButtonField symbols={loadingRound? "Lade..." : roundObj.Level.Code.Runes} count={loadingRound? "": roundObj.Level.Difficulty.PSC} onClick={handleSymbolClick}  />
+            <SymbolButtonField symbols={loadingRound? "Lade..." : roundObj.Runes} count={loadingRound? "": roundObj.Difficulty.PSC} onClick={handleSymbolClick}  />
           </div>
+          {lvlCleared && (
+          <SolvedPopUp
+              isOpen={isLoading || roundObj.Solved}
+              onClose={goToEndPopUp}
+              onNext={handleNextLevel}
+              level={isLoading || roundObj.Level}
+              trys={isLoading || roundObj.Trys}
+              time={remainingTime}
+              score={score}>
+          </SolvedPopUp>
+          )}
+          <EndRoundPopUp isOpen={showEndRoundPopUp} onClose={goToStartScreen} onSubmit={handleNameSubmit} level={isLoading || roundObj.Level} score={score}></EndRoundPopUp>
         </div>
       </div>
       <div className="right"></div>

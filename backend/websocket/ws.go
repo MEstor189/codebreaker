@@ -35,6 +35,11 @@ type GuessContent struct {
 	PressedSymbols []string `json:"pressedSymbols"`
 }
 
+type HighscoreEntry struct {
+	PlayerName string `json:"name"`
+	Score      int    `json:"score"`
+}
+
 func StartWebSocketServer() {
 	manager := &Manager{
 		Clients:    make(map[*Client]bool),
@@ -102,6 +107,16 @@ func ProcessMessage(client *Client, manager *Manager, msg []byte) {
 
 	case "nextLevel":
 		HandleNextLevel(client.Conn, client.GameInstance, true)
+
+	case "highscoreEntry":
+		var highscoreEntry HighscoreEntry
+		err := json.Unmarshal(incomingMessage.Payload, &highscoreEntry)
+		if err != nil {
+			fmt.Println("Error parsing 'guess'-data:", err)
+			return
+		}
+		fmt.Println(highscoreEntry)
+		HandleHighscoreEntry(client.Conn, client.GameInstance, highscoreEntry.PlayerName, highscoreEntry.Score)
 
 	default:
 		fmt.Println("Unknown Messagetype:", incomingMessage.Type)

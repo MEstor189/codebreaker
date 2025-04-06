@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+
 import './StartScreen.css';
 import { useNavigate } from 'react-router-dom';
 import { useWebSocket } from '../components/WebSocket/WebSocketContext';
@@ -6,7 +6,7 @@ import { useWebSocket } from '../components/WebSocket/WebSocketContext';
 
 function StartScreen() {
     const navigate = useNavigate();
-    const { isConnected, sendMessage } = useWebSocket();
+    const { isConnected } = useWebSocket();
 
     const goToGameScreen = () => {
         //handleStart();
